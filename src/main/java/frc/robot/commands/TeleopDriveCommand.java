@@ -35,7 +35,7 @@ public class TeleopDriveCommand extends CommandBase {
 
     @Override
     public void initialize() {
-        m_DriveBaseSubsystem.chassisControl(0.0, 0.0, 0.25);
+        m_DriveBaseSubsystem.chassisControl(0.0, 0.0, 0.0);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class TeleopDriveCommand extends CommandBase {
             speedControl = 0.1;
         }
         if (m_buttonStart.getAsBoolean()) {
-            speedControl = 1;
+            speedControl = 0.25;
         }
 
         // The left joystick is negative due to the controller being in pilot/flight mode
@@ -55,7 +55,7 @@ public class TeleopDriveCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
-        m_DriveBaseSubsystem.chassisControl(0.0, 0.0, 0.25);
+        m_DriveBaseSubsystem.chassisControl(0.0, 0.0, 0.0);
     }
 
     @Override

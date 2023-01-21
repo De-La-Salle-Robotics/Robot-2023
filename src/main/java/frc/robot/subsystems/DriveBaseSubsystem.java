@@ -37,8 +37,13 @@ public class DriveBaseSubsystem extends SubsystemBase {
 
     public void chassisControl(double leftJoystick, double rightJoystick, double speedControl) {
 
-        double leftSidePower = (leftJoystick + rightJoystick) * speedControl;
-        double rightSidePower = -(leftJoystick - rightJoystick) * speedControl;
+        leftJoystick *= speedControl;
+        double inverseSpeed = 1 - speedControl;
+        inverseSpeed /= 1.8;
+        rightJoystick *= (1 - inverseSpeed);
+
+        double leftSidePower = leftJoystick + rightJoystick;
+        double rightSidePower = -(leftJoystick - rightJoystick);
 
         m_rightLeader.set(ControlMode.PercentOutput, rightSidePower);
         m_rightMiddle.set(ControlMode.PercentOutput, rightSidePower);
