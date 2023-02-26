@@ -38,10 +38,8 @@ public final class Constants {
         public static final int kConeServorPort = 0;
         public static final int kCubeServorPort = 1;
 
-        public static final int kConeSolenoidPortForward = 0;
-        public static final int kConeSolenoidPortReverse = 1;
-        public static final int kCubeSolenoidPortForward = 2;
-        public static final int kCubeSolenoidPortReverse = 3;
+        public static final int kConeSolenoidPort = 0;
+        public static final int kCubeSolenoidPort = 1;
 
         public static final int kVaccuumPumpId = 0;
     }

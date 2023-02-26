@@ -65,8 +65,6 @@ public class RobotContainer {
                             return VaccuumState.NoChange;
                         case 90:
                             return VaccuumState.Released;
-                        case 180:
-                            return VaccuumState.Stopped;
                         case 270:
                             return VaccuumState.Sucking;
                     }

@@ -4,10 +4,9 @@ import static frc.robot.Constants.EndEffectorConstants.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
-import edu.wpi.first.wpilibj.DoubleSolenoid;
-import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PWM;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,7 +23,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
     public enum VaccuumState {
         Sucking,
         Released,
-        Stopped,
         NoChange
     }
 
@@ -36,12 +34,8 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     private PWM m_coneServo = new PWM(kConeServorPort);
     private PWM m_cubeSero = new PWM(kCubeServorPort);
-    private DoubleSolenoid m_coneSolenoid =
-            new DoubleSolenoid(
-                    PneumaticsModuleType.CTREPCM, kConeSolenoidPortForward, kConeSolenoidPortReverse);
-    private DoubleSolenoid m_cubeSolenoid =
-            new DoubleSolenoid(
-                    PneumaticsModuleType.CTREPCM, kCubeSolenoidPortForward, kCubeSolenoidPortReverse);
+    private Solenoid m_coneSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, kConeSolenoidPort);
+    private Solenoid m_cubeSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, kCubeSolenoidPort);
 
     private WPI_VictorSPX m_vaccuumPump = new WPI_VictorSPX(kVaccuumPumpId);
 
@@ -54,9 +48,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
                             switch (vaccuumState.get()) {
                                 case Sucking:
                                     suctionCube();
-                                    break;
-                                case Stopped:
-                                    holdCube();
                                     break;
                                 case Released:
                                     releaseCube();
@@ -86,9 +77,6 @@ public class EndEffectorSubsystem extends SubsystemBase {
                             switch (vaccuumState.get()) {
                                 case Sucking:
                                     suctionCone();
-                                    break;
-                                case Stopped:
-                                    holdCone();
                                     break;
                                 case Released:
                                     releaseCone();
@@ -129,38 +117,24 @@ public class EndEffectorSubsystem extends SubsystemBase {
 
     public void suctionCone() {
         /* If we're setting cone solenoid, we need to make sure cube is off */
-        m_cubeSolenoid.set(Value.kOff);
+        m_cubeSolenoid.set(false);
 
-        m_coneSolenoid.set(Value.kForward);
-    }
-
-    public void holdCone() {
-        m_coneSolenoid.set(Value.kOff);
+        m_coneSolenoid.set(true);
     }
 
     public void releaseCone() {
-        /* If we're setting cone solenoid, we need to make sure cube is off */
-        m_cubeSolenoid.set(Value.kOff);
-
-        m_coneSolenoid.set(Value.kReverse);
+        m_coneSolenoid.set(false);
     }
 
     public void suctionCube() {
         /* If we're setting cube solenoid, we need to make sure cone is off */
-        m_coneSolenoid.set(Value.kOff);
+        m_coneSolenoid.set(false);
 
-        m_cubeSolenoid.set(Value.kForward);
-    }
-
-    public void holdCube() {
-        m_cubeSolenoid.set(Value.kOff);
+        m_cubeSolenoid.set(true);
     }
 
     public void releaseCube() {
-        /* If we're setting cube solenoid, we need to make sure cone is off */
-        m_coneSolenoid.set(Value.kOff);
-
-        m_cubeSolenoid.set(Value.kReverse);
+        m_cubeSolenoid.set(false);
     }
 
     public void runVaccuum() {
