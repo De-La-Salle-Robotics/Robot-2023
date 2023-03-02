@@ -21,12 +21,12 @@ public final class Constants {
     }
 
     public static class DriveTrainConstants {
-        public static final int kLeftDriveId1 = 0;
-        public static final int kLeftDriveId2 = 1;
-        public static final int kLeftDriveId3 = 2;
-        public static final int kRghtDriveId1 = 3;
-        public static final int kRghtDriveId2 = 4;
-        public static final int kRghtDriveId3 = 5;
+        public static final int kRghtDriveId1 = 0;
+        public static final int kRghtDriveId2 = 1;
+        public static final int kRghtDriveId3 = 2;
+        public static final int kLeftDriveId1 = 3;
+        public static final int kLeftDriveId2 = 4;
+        public static final int kLeftDriveId3 = 5;
     }
 
     public static class TurretConstants {

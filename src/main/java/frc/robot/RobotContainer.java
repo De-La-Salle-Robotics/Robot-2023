@@ -5,7 +5,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.CommandPS4Controller;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -32,8 +31,8 @@ public class RobotContainer {
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController =
             new CommandXboxController(OperatorConstants.kDriverControllerPort);
-    private final CommandPS4Controller m_operatorController =
-            new CommandPS4Controller(OperatorConstants.kOperatorControllerPort);
+    private final CommandXboxController m_operatorController =
+            new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
@@ -71,20 +70,20 @@ public class RobotContainer {
                 };
         Supplier<EndEffectorSubsystem.EffectorState> effectorStateSupplier =
                 () -> {
-                    if (m_operatorController.triangle().getAsBoolean()) {
+                    if (m_operatorController.y().getAsBoolean()) {
                         return EffectorState.Up;
                     }
-                    if (m_operatorController.cross().getAsBoolean()) {
+                    if (m_operatorController.a().getAsBoolean()) {
                         return EffectorState.Down;
                     }
                     return EffectorState.NoChange;
                 };
         m_operatorController
-                .L1()
+                .leftBumper()
                 .whileTrue(
                         m_endEffectorSubsystem.controlCubeSide(vaccuumStateSupplier, effectorStateSupplier));
         m_operatorController
-                .R1()
+                .rightBumper()
                 .whileTrue(
                         m_endEffectorSubsystem.controlConeSide(vaccuumStateSupplier, effectorStateSupplier));
     }
