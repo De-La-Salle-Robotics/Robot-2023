@@ -17,7 +17,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     private final double kConeServoUp = 1;
     private final double kCubeServoDown = -1;
     private final double kCubeServoUp = 1;
-    private final double kVaccuumRunningPower = 0.4;
+    private final double kVaccuumRunningPower = 0.6;
     private final double kVaccuumStopPower = 0;
 
     public enum VaccuumState {

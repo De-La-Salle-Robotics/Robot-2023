@@ -14,6 +14,7 @@ import frc.robot.subsystems.EndEffectorSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem.EffectorState;
 import frc.robot.subsystems.EndEffectorSubsystem.VaccuumState;
+import frc.robot.subsystems.TurretSubsystem.TurretPosition;
 import frc.robot.subsystems.TurretSubsystem;
 import java.util.function.Supplier;
 
@@ -90,6 +91,24 @@ public class RobotContainer {
                 .rightBumper()
                 .whileTrue(
                         m_endEffectorSubsystem.controlConeSide(vaccuumStateSupplier, effectorStateSupplier));
+        
+        // Supplier<TurretSubsystem.TurretPosition> turretPositionSupplier =() ->{
+        //     switch (m_operatorController.getHID().getPOV()) {
+        //         default:
+        //             return TurretPosition.NoChange;
+        //         case 0:
+        //             return TurretPosition.Forward;
+        //         case 90:
+        //             return TurretPosition.Right;
+        //         case 180:
+        //             return TurretPosition.Backward;
+        //         case 270:
+        //             return TurretPosition.Left;
+        //     }
+        // };
+        // m_operatorController.axisGreaterThan(2, 0.4).whileTrue(
+        //     m_turretSubsystem.setTurretCommand(turretPositionSupplier)
+        // );
     }
 
     /**

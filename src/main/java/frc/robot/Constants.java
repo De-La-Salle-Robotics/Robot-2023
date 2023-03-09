@@ -32,6 +32,7 @@ public final class Constants {
     public static class TurretConstants {
         public static final int kTurretControllerId = 10;
         public static final int kFourBarControllerId = 11;
+        public static final int kCANcoderID = 0;
     }
 
     public static class EndEffectorConstants {
