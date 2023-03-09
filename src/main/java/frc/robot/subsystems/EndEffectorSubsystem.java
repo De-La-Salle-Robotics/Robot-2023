@@ -13,11 +13,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
 
 public class EndEffectorSubsystem extends SubsystemBase {
-    private final double kConeServoDown = 0;
+    private final double kConeServoDown = -1;
     private final double kConeServoUp = 1;
-    private final double kCubeServoDown = 0;
+    private final double kCubeServoDown = -1;
     private final double kCubeServoUp = 1;
-    private final double kVaccuumRunningPower = 0.3;
+    private final double kVaccuumRunningPower = 0.4;
     private final double kVaccuumStopPower = 0;
 
     public enum VaccuumState {
@@ -33,7 +33,7 @@ public class EndEffectorSubsystem extends SubsystemBase {
     }
 
     private PWM m_coneServo = new PWM(kConeServorPort);
-    private PWM m_cubeSero = new PWM(kCubeServorPort);
+    private PWM m_cubeServo = new PWM(kCubeServorPort);
     private Solenoid m_coneSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, kConeSolenoidPort);
     private Solenoid m_cubeSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, kCubeSolenoidPort);
 
@@ -108,11 +108,11 @@ public class EndEffectorSubsystem extends SubsystemBase {
     }
 
     public void putCubeServoDown() {
-        m_cubeSero.setPosition(kCubeServoDown);
+        m_cubeServo.setPosition(kCubeServoDown);
     }
 
     public void putCubeServoUp() {
-        m_cubeSero.setPosition(kCubeServoUp);
+        m_cubeServo.setPosition(kCubeServoUp);
     }
 
     public void suctionCone() {
@@ -120,10 +120,12 @@ public class EndEffectorSubsystem extends SubsystemBase {
         m_cubeSolenoid.set(false);
 
         m_coneSolenoid.set(true);
+        runVaccuum();
     }
 
     public void releaseCone() {
         m_coneSolenoid.set(false);
+        stopVaccuum();
     }
 
     public void suctionCube() {
@@ -131,10 +133,12 @@ public class EndEffectorSubsystem extends SubsystemBase {
         m_coneSolenoid.set(false);
 
         m_cubeSolenoid.set(true);
+        runVaccuum();
     }
 
     public void releaseCube() {
         m_cubeSolenoid.set(false);
+        stopVaccuum();
     }
 
     public void runVaccuum() {

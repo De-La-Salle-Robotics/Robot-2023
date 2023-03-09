@@ -5,11 +5,11 @@ import com.ctre.phoenix.led.CANdle;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class LEDSubsystem extends SubsystemBase {    
-    private CANdle m_CANdle_0 = new CANdle(20, "rio");
+    private CANdle m_candle = new CANdle(6, "canivore");
 
-    private int RED = 0;
+    private int RED = 125;
     private int GREEN = 0;
-    private int BLUE = 0;
+    private int BLUE = 125;
 
     private boolean pgToggle = true;
     private int wait = 0;
@@ -19,8 +19,8 @@ public class LEDSubsystem extends SubsystemBase {
 
     public void startup() {
         // Initial setup
-        m_CANdle_0.clearAnimation(0);
-        m_CANdle_0.setLEDs(0, 0, 0);
+        m_candle.clearAnimation(0);
+        m_candle.setLEDs(0, 0, 0);
     }
 
     public void PurpleGold() {
@@ -65,7 +65,7 @@ public class LEDSubsystem extends SubsystemBase {
             if (RED == 40 & GREEN == 0 & BLUE == 56) {
                 hold = true;
             }
-            m_CANdle_0.setLEDs(RED, GREEN, BLUE);
+            m_candle.setLEDs(RED, GREEN, BLUE);
         }
 
         if (fadeToGold) {
@@ -82,7 +82,7 @@ public class LEDSubsystem extends SubsystemBase {
             if (RED == 255 & GREEN == 180 & BLUE == 0) {
                 hold = true;
             }
-            m_CANdle_0.setLEDs(RED, GREEN, BLUE);
+            m_candle.setLEDs(RED, GREEN, BLUE);
         }
         // if (wait > 0 & wait < 50){
         //    m_CANdle_0.setLEDs(40, 0, 56);
@@ -94,6 +94,6 @@ public class LEDSubsystem extends SubsystemBase {
 
     // Set LEDs to specific values --- most likely to be used for status
     public void setLED0(int R, int G, int B, int startIndex, int count) {
-        m_CANdle_0.setLEDs(RED, GREEN, BLUE, 0, startIndex, count);
+        m_candle.setLEDs(RED, GREEN, BLUE, 0, startIndex, count);
     }
 }

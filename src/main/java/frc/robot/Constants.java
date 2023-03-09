@@ -35,8 +35,8 @@ public final class Constants {
     }
 
     public static class EndEffectorConstants {
-        public static final int kConeServorPort = 0;
-        public static final int kCubeServorPort = 1;
+        public static final int kConeServorPort = 1;
+        public static final int kCubeServorPort = 2;
 
         public static final int kConeSolenoidPort = 0;
         public static final int kCubeSolenoidPort = 1;
