@@ -13,10 +13,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.function.Supplier;
 
 public class EndEffectorSubsystem extends SubsystemBase {
-    private final double kConeServoDown = -1;
-    private final double kConeServoUp = 1;
-    private final double kCubeServoDown = -1;
-    private final double kCubeServoUp = 1;
+    private final double kServoDown = -1;
+    private final double kServoUp = 0.85;
     private final double kVaccuumRunningPower = 0.6;
     private final double kVaccuumStopPower = 0;
 
@@ -32,35 +30,35 @@ public class EndEffectorSubsystem extends SubsystemBase {
         NoChange
     }
 
-    private PWM m_coneServo = new PWM(kConeServorPort);
-    private PWM m_cubeServo = new PWM(kCubeServorPort);
-    private Solenoid m_coneSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, kConeSolenoidPort);
-    private Solenoid m_cubeSolenoid = new Solenoid(PneumaticsModuleType.CTREPCM, kCubeSolenoidPort);
+    private PWM m_servo = new PWM(kServoPort);
+
+    private Solenoid m_releaseSolenoid =
+            new Solenoid(PneumaticsModuleType.CTREPCM, kReleaseSolenoidPort);
 
     private WPI_VictorSPX m_vaccuumPump = new WPI_VictorSPX(kVaccuumPumpId);
 
     public EndEffectorSubsystem() {}
 
-    public CommandBase controlCubeSide(
+    public CommandBase controlEffector(
             Supplier<VaccuumState> vaccuumState, Supplier<EffectorState> effectorState) {
         return new RunCommand(
                         () -> {
                             switch (vaccuumState.get()) {
                                 case Sucking:
-                                    suctionCube();
+                                    suck();
                                     break;
                                 case Released:
-                                    releaseCube();
+                                    release();
                                     break;
                                 case NoChange:
                                     break;
                             }
                             switch (effectorState.get()) {
                                 case Up:
-                                    putCubeServoUp();
+                                    putServoUp();
                                     break;
                                 case Down:
-                                    putCubeServoDown();
+                                    putServoDown();
                                     break;
                                 case NoChange:
                                     break;
@@ -70,74 +68,23 @@ public class EndEffectorSubsystem extends SubsystemBase {
                 .ignoringDisable(true);
     }
 
-    public CommandBase controlConeSide(
-            Supplier<VaccuumState> vaccuumState, Supplier<EffectorState> effectorState) {
-        return new RunCommand(
-                        () -> {
-                            switch (vaccuumState.get()) {
-                                case Sucking:
-                                    suctionCone();
-                                    break;
-                                case Released:
-                                    releaseCone();
-                                    break;
-                                case NoChange:
-                                    break;
-                            }
-                            switch (effectorState.get()) {
-                                case Up:
-                                    putConeServoUp();
-                                    break;
-                                case Down:
-                                    putConeServoDown();
-                                    break;
-                                case NoChange:
-                                    break;
-                            }
-                        },
-                        this)
-                .ignoringDisable(true);
+    public void putServoDown() {
+        m_servo.setPosition(kServoDown);
     }
 
-    public void putConeServoDown() {
-        m_coneServo.setPosition(kConeServoDown);
+    public void putServoUp() {
+        m_servo.setPosition(kServoUp);
     }
 
-    public void putConeServoUp() {
-        m_coneServo.setPosition(kConeServoUp);
-    }
+    public void suck() {
+        m_releaseSolenoid.set(false);
 
-    public void putCubeServoDown() {
-        m_cubeServo.setPosition(kCubeServoDown);
-    }
-
-    public void putCubeServoUp() {
-        m_cubeServo.setPosition(kCubeServoUp);
-    }
-
-    public void suctionCone() {
-        /* If we're setting cone solenoid, we need to make sure cube is off */
-        m_cubeSolenoid.set(false);
-
-        m_coneSolenoid.set(true);
         runVaccuum();
     }
 
-    public void releaseCone() {
-        m_coneSolenoid.set(false);
-        stopVaccuum();
-    }
+    public void release() {
+        m_releaseSolenoid.set(true);
 
-    public void suctionCube() {
-        /* If we're setting cube solenoid, we need to make sure cone is off */
-        m_coneSolenoid.set(false);
-
-        m_cubeSolenoid.set(true);
-        runVaccuum();
-    }
-
-    public void releaseCube() {
-        m_cubeSolenoid.set(false);
         stopVaccuum();
     }
 

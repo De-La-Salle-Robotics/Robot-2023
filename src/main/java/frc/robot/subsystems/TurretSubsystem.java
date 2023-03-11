@@ -10,11 +10,9 @@ import com.ctre.phoenixpro.hardware.CANcoder;
 import com.ctre.phoenixpro.hardware.TalonFX;
 import com.ctre.phoenixpro.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenixpro.signals.NeutralModeValue;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
@@ -54,21 +52,26 @@ public class TurretSubsystem extends SubsystemBase {
         cfg.Feedback.FeedbackRemoteSensorID = m_cancoder.getDeviceID();
         cfg.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
 
-        cfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 1.1;
+        cfg.SoftwareLimitSwitch.ForwardSoftLimitThreshold = 0.85;
         cfg.SoftwareLimitSwitch.ReverseSoftLimitThreshold = 0.2;
         cfg.SoftwareLimitSwitch.ForwardSoftLimitEnable = true;
         cfg.SoftwareLimitSwitch.ReverseSoftLimitEnable = true;
 
         cfg.Slot0.kP = 0.1;
-        
+
         m_turretController.getConfigurator().apply(cfg);
     }
 
     public CommandBase manualControlCommand(
-            DoubleSupplier turretControl, DoubleSupplier fourBarControl, BooleanSupplier slowdownEnabled) {
+            DoubleSupplier turretControl,
+            DoubleSupplier fourBarControl,
+            BooleanSupplier slowdownEnabled) {
         return new RunCommand(
                         () -> {
-                            manualControl(turretControl.getAsDouble(), fourBarControl.getAsDouble(), slowdownEnabled.getAsBoolean());
+                            manualControl(
+                                    turretControl.getAsDouble(),
+                                    fourBarControl.getAsDouble(),
+                                    slowdownEnabled.getAsBoolean());
                         },
                         this)
                 .ignoringDisable(true);
@@ -83,8 +86,7 @@ public class TurretSubsystem extends SubsystemBase {
         m_fourBarController.setControl(m_fourBarOut.withOutput(fourBarControl * 0.2 * speed));
     }
 
-    public CommandBase setTurretCommand(
-            Supplier<TurretPosition> turretPosition) {
+    public CommandBase setTurretCommand(Supplier<TurretPosition> turretPosition) {
         return new RunCommand(
                         () -> {
                             setTurretPosition(turretPosition.get());
@@ -93,15 +95,12 @@ public class TurretSubsystem extends SubsystemBase {
                 .ignoringDisable(true);
     }
 
-    public void setTurretPosition(TurretPosition position)
-    {
-        if(position != TurretPosition.NoChange)
-        {
+    public void setTurretPosition(TurretPosition position) {
+        if (position != TurretPosition.NoChange) {
             m_lastTurretPosition = position;
         }
 
-        switch(m_lastTurretPosition)
-        {
+        switch (m_lastTurretPosition) {
             case Manual:
             case NoChange:
                 /* Shouldn't happen */

@@ -12,7 +12,7 @@ public final class Autos {
         return drive
                 .arcadeDriveCommand(
                         () -> {
-                            return 0.1;
+                            return -0.4;
                         },
                         () -> {
                             return 0;
@@ -37,8 +37,7 @@ public final class Autos {
                                 },
                                 () -> {
                                     return false;
-                                }
-                                ));
+                                }));
     }
 
     private Autos() {

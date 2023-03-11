@@ -11,11 +11,10 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem;
-import frc.robot.subsystems.LEDSubsystem;
 import frc.robot.subsystems.EndEffectorSubsystem.EffectorState;
 import frc.robot.subsystems.EndEffectorSubsystem.VaccuumState;
-import frc.robot.subsystems.TurretSubsystem.TurretPosition;
 import frc.robot.subsystems.TurretSubsystem;
+
 import java.util.function.Supplier;
 
 /**
@@ -29,7 +28,6 @@ public class RobotContainer {
     private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
     private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
     private final EndEffectorSubsystem m_endEffectorSubsystem = new EndEffectorSubsystem();
-    private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController =
@@ -41,8 +39,6 @@ public class RobotContainer {
     public RobotContainer() {
         // Configure the trigger bindings
         configureBindings();
-        m_LEDSubsystem.startup();
-        m_LEDSubsystem.PurpleGold();
     }
 
     /**
@@ -83,17 +79,10 @@ public class RobotContainer {
                     }
                     return EffectorState.NoChange;
                 };
-        m_operatorController
-                .leftBumper()
-                .whileTrue(
-                        m_endEffectorSubsystem.controlCubeSide(vaccuumStateSupplier, effectorStateSupplier));
-        m_operatorController
-                .rightBumper()
-                .whileTrue(
-                        m_endEffectorSubsystem.controlConeSide(vaccuumStateSupplier, effectorStateSupplier));
         
-        // Supplier<TurretSubsystem.TurretPosition> turretPositionSupplier =() ->{
-        //     switch (m_operatorController.getHID().getPOV()) {
+        m_endEffectorSubsystem.setDefaultCommand(m_endEffectorSubsystem.controlEffector(vaccuumStateSupplier, effectorStateSupplier));
+
+       //     switch (m_operatorController.getHID().getPOV()) {
         //         default:
         //             return TurretPosition.NoChange;
         //         case 0:
@@ -118,6 +107,6 @@ public class RobotContainer {
      */
     public Command getAutonomousCommand() {
         // An example command will be run in autonomous
-        return Autos.driveStraight(m_driveSubsystem, 0.1);
+        return Autos.driveStraight(m_driveSubsystem, 1.25);
     }
 }

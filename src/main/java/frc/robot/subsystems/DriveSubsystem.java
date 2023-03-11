@@ -9,8 +9,8 @@ import com.ctre.phoenixpro.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import java.util.function.DoubleSupplier;
 import java.util.function.BooleanSupplier;
+import java.util.function.DoubleSupplier;
 
 public class DriveSubsystem extends SubsystemBase {
 
@@ -34,16 +34,25 @@ public class DriveSubsystem extends SubsystemBase {
         m_rghtDrive3.setControl(m_rghtFollow);
     }
 
-    public CommandBase arcadeDriveCommand(DoubleSupplier forward, DoubleSupplier turn, BooleanSupplier slowdownEnabled, BooleanSupplier speedupEnabled) {
+    public CommandBase arcadeDriveCommand(
+            DoubleSupplier forward,
+            DoubleSupplier turn,
+            BooleanSupplier slowdownEnabled,
+            BooleanSupplier speedupEnabled) {
         return new RunCommand(
                         () -> {
-                            arcadeDrive(forward.getAsDouble(), turn.getAsDouble(), slowdownEnabled.getAsBoolean(), speedupEnabled.getAsBoolean());
+                            arcadeDrive(
+                                    forward.getAsDouble(),
+                                    turn.getAsDouble(),
+                                    slowdownEnabled.getAsBoolean(),
+                                    speedupEnabled.getAsBoolean());
                         },
                         this)
                 .ignoringDisable(true);
     }
 
-    public void arcadeDrive(double forward, double turn, boolean slowdownEnabled, boolean speedupEnabled) {
+    public void arcadeDrive(
+            double forward, double turn, boolean slowdownEnabled, boolean speedupEnabled) {
         double speed = 0.3;
         if (slowdownEnabled) {
             speed = 0.15;
@@ -52,13 +61,13 @@ public class DriveSubsystem extends SubsystemBase {
             speed = 0.45;
         }
 
-        double inverseSpeed = 1 - speed;
+        double inverseSpeed = 1 - (speed * 0.5);
         inverseSpeed /= 1.5;
         turn *= (1 - inverseSpeed);
         forward *= speed;
 
         m_leftDrive1.setControl(m_leftOut.withOutput(-(forward - turn)));
-        //0.9 for slight left drift error
+        // 0.9 for slight left drift error
         m_rghtDrive1.setControl(m_rghtOut.withOutput((forward + turn) * 0.9));
     }
 
