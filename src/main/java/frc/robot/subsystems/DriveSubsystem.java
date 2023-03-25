@@ -3,12 +3,17 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.*;
 import static frc.robot.Constants.DriveTrainConstants.*;
 
+import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.controls.DutyCycleOut;
 import com.ctre.phoenixpro.controls.Follower;
 import com.ctre.phoenixpro.hardware.TalonFX;
+import com.ctre.phoenixpro.signals.NeutralModeValue;
+
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.CtrUtils;
+
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
@@ -28,6 +33,16 @@ public class DriveSubsystem extends SubsystemBase {
     private Follower m_rghtFollow = new Follower(m_rghtDrive1.getDeviceID(), false);
 
     public DriveSubsystem() {
+        TalonFXConfiguration cfg = new TalonFXConfiguration();
+        cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+
+        CtrUtils.runUntilSuccessWithTimeoutPro((timeout)->{return m_leftDrive1.getConfigurator().apply(cfg);}, 0.1, 5);
+        CtrUtils.runUntilSuccessWithTimeoutPro((timeout)->{return m_leftDrive2.getConfigurator().apply(cfg);}, 0.1, 5);
+        CtrUtils.runUntilSuccessWithTimeoutPro((timeout)->{return m_leftDrive3.getConfigurator().apply(cfg);}, 0.1, 5);
+        CtrUtils.runUntilSuccessWithTimeoutPro((timeout)->{return m_rghtDrive1.getConfigurator().apply(cfg);}, 0.1, 5);
+        CtrUtils.runUntilSuccessWithTimeoutPro((timeout)->{return m_rghtDrive2.getConfigurator().apply(cfg);}, 0.1, 5);
+        CtrUtils.runUntilSuccessWithTimeoutPro((timeout)->{return m_rghtDrive3.getConfigurator().apply(cfg);}, 0.1, 5);
+
         m_leftDrive2.setControl(m_leftFollow);
         m_leftDrive3.setControl(m_leftFollow);
         m_rghtDrive2.setControl(m_rghtFollow);

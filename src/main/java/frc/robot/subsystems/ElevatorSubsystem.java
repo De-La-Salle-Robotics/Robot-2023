@@ -3,11 +3,14 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.*;
 import static frc.robot.Constants.ElevatorConstants.*;
 
+import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.controls.DutyCycleOut;
 import com.ctre.phoenixpro.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.utils.CtrUtils;
+
 import java.util.function.DoubleSupplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
@@ -18,7 +21,12 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final DutyCycleOut m_elevatorPower = new DutyCycleOut(0);
     private final DutyCycleOut m_extenderPower = new DutyCycleOut(0);
 
-    public ElevatorSubsystem() {}
+    public ElevatorSubsystem() {
+        TalonFXConfiguration cfg = new TalonFXConfiguration();
+
+        CtrUtils.runUntilSuccessWithTimeoutPro((timeout)->{return m_elevatorMotor.getConfigurator().apply(cfg);}, 0.1, 5);
+        CtrUtils.runUntilSuccessWithTimeoutPro((timeout)->{return m_extenderMotor.getConfigurator().apply(cfg);}, 0.1, 5);
+    }
 
     public CommandBase manualControlElevatorCommand(
             DoubleSupplier elevatorPower, DoubleSupplier extenderPower) {
