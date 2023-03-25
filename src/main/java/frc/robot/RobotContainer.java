@@ -13,6 +13,7 @@ import frc.robot.subsystems.ClawSubsystem;
 import frc.robot.subsystems.ClawSubsystem.ClawState;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ElevatorSubsystem.DesiredLocation;
 import java.util.function.Supplier;
 
 /**
@@ -55,14 +56,33 @@ public class RobotContainer {
                         m_driverController::getRightX,
                         m_driverController.leftBumper(),
                         m_driverController.rightBumper()));
+
+        Supplier<DesiredLocation> elevatorLocationSupplier =
+                () -> {
+                    var controller = m_operatorController.getHID();
+                    if (controller.getAButton()) return DesiredLocation.Stow;
+                    if (controller.getXButton()) return DesiredLocation.MiddleScore;
+                    if (controller.getYButton()) return DesiredLocation.HighScore;
+                    if (controller.getBButton()) return DesiredLocation.LoadStationPickup;
+                    return DesiredLocation.NoChange;
+                };
         m_elevatorSubsystem.setDefaultCommand(
-                m_elevatorSubsystem.manualControlElevatorCommand(
+                m_elevatorSubsystem.setClosedLoopCommand(elevatorLocationSupplier));
+
+        new Trigger(
+                        /* If the joystick is deflected, fall back to manual control */
                         () -> {
-                            return -m_operatorController.getLeftY();
-                        },
-                        () -> {
-                            return -m_operatorController.getRightY();
-                        }));
+                            return Math.abs(m_operatorController.getLeftY()) > 0.1
+                                    || Math.abs(m_operatorController.getRightY()) > 0.1;
+                        })
+                .whileTrue(
+                        m_elevatorSubsystem.manualControlElevatorCommand(
+                                () -> {
+                                    return -m_operatorController.getLeftY();
+                                },
+                                () -> {
+                                    return -m_operatorController.getRightY();
+                                }));
 
         Supplier<ClawSubsystem.ClawState> clawStateSupplier =
                 () -> {

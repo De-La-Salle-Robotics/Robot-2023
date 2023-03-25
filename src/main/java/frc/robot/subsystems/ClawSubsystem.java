@@ -2,15 +2,13 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.ClawConstants.*;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.CtrUtils;
-
 import java.util.function.Supplier;
-
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 public class ClawSubsystem extends SubsystemBase {
     private final double kSuckPower = 0.6;
@@ -27,7 +25,12 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     public ClawSubsystem() {
-        CtrUtils.runUntilSuccessWithTimeoutV5((timeout)->{return m_clawMotor.configFactoryDefault(timeout);}, 100, 5);
+        CtrUtils.runUntilSuccessWithTimeoutV5(
+                (timeout) -> {
+                    return m_clawMotor.configFactoryDefault(timeout);
+                },
+                100,
+                5);
     }
 
     public CommandBase controlClaw(Supplier<ClawState> clawState) {
