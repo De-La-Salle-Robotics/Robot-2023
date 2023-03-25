@@ -29,17 +29,12 @@ public final class Constants {
         public static final int kLeftDriveId3 = 5;
     }
 
-    public static class TurretConstants {
-        public static final int kTurretControllerId = 10;
-        public static final int kFourBarControllerId = 11;
-        public static final int kCANcoderID = 0;
+    public static class ClawConstants {
+        public static final int kClawTalonId = 6;
     }
 
-    public static class EndEffectorConstants {
-        public static final int kServoPort = 1;
-
-        public static final int kReleaseSolenoidPort = 2;
-
-        public static final int kVaccuumPumpId = 0;
+    public static class ElevatorConstants {
+        public static final int kElevatorTalonId = 7;
+        public static final int kExtenderTalonId = 8;
     }
 }

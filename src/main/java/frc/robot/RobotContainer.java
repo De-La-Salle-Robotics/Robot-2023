@@ -9,12 +9,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
+import frc.robot.subsystems.ClawSubsystem;
+import frc.robot.subsystems.ClawSubsystem.ClawState;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.robot.subsystems.EndEffectorSubsystem;
-import frc.robot.subsystems.EndEffectorSubsystem.EffectorState;
-import frc.robot.subsystems.EndEffectorSubsystem.VaccuumState;
-import frc.robot.subsystems.TurretSubsystem;
-
+import frc.robot.subsystems.ElevatorSubsystem;
 import java.util.function.Supplier;
 
 /**
@@ -26,8 +24,8 @@ import java.util.function.Supplier;
 public class RobotContainer {
     // The robot's subsystems and commands are defined here...
     private final DriveSubsystem m_driveSubsystem = new DriveSubsystem();
-    private final TurretSubsystem m_turretSubsystem = new TurretSubsystem();
-    private final EndEffectorSubsystem m_endEffectorSubsystem = new EndEffectorSubsystem();
+    private final ClawSubsystem m_clawSubsystem = new ClawSubsystem();
+    private final ElevatorSubsystem m_elevatorSubsystem = new ElevatorSubsystem();
 
     // Replace with CommandPS4Controller or CommandJoystick if needed
     private final CommandXboxController m_driverController =
@@ -53,51 +51,31 @@ public class RobotContainer {
     private void configureBindings() {
         m_driveSubsystem.setDefaultCommand(
                 m_driveSubsystem.arcadeDriveCommand(
-                        m_driverController::getLeftY, m_driverController::getRightX, m_driverController.leftBumper(), m_driverController.rightBumper() ));
-        m_turretSubsystem.setDefaultCommand(
-                m_turretSubsystem.manualControlCommand(
-                        m_operatorController::getLeftX, m_operatorController::getRightY, m_operatorController.leftBumper()));
+                        m_driverController::getLeftY,
+                        m_driverController::getRightX,
+                        m_driverController.leftBumper(),
+                        m_driverController.rightBumper()));
+        m_elevatorSubsystem.setDefaultCommand(
+                m_elevatorSubsystem.manualControlElevatorCommand(
+                        () -> {
+                            return -m_operatorController.getLeftY();
+                        },
+                        () -> {
+                            return -m_operatorController.getRightY();
+                        }));
 
-        Supplier<EndEffectorSubsystem.VaccuumState> vaccuumStateSupplier =
+        Supplier<ClawSubsystem.ClawState> clawStateSupplier =
                 () -> {
                     switch (m_operatorController.getHID().getPOV()) {
                         default:
-                            return VaccuumState.NoChange;
-                        case 90:
-                            return VaccuumState.Released;
-                        case 270:
-                            return VaccuumState.Sucking;
+                            return ClawState.Neutral;
+                        case 0:
+                            return ClawState.Blowing;
+                        case 180:
+                            return ClawState.Sucking;
                     }
                 };
-        Supplier<EndEffectorSubsystem.EffectorState> effectorStateSupplier =
-                () -> {
-                    if (m_operatorController.y().getAsBoolean()) {
-                        return EffectorState.Up;
-                    }
-                    if (m_operatorController.a().getAsBoolean()) {
-                        return EffectorState.Down;
-                    }
-                    return EffectorState.NoChange;
-                };
-        
-        m_endEffectorSubsystem.setDefaultCommand(m_endEffectorSubsystem.controlEffector(vaccuumStateSupplier, effectorStateSupplier));
-
-       //     switch (m_operatorController.getHID().getPOV()) {
-        //         default:
-        //             return TurretPosition.NoChange;
-        //         case 0:
-        //             return TurretPosition.Forward;
-        //         case 90:
-        //             return TurretPosition.Right;
-        //         case 180:
-        //             return TurretPosition.Backward;
-        //         case 270:
-        //             return TurretPosition.Left;
-        //     }
-        // };
-        // m_operatorController.axisGreaterThan(2, 0.4).whileTrue(
-        //     m_turretSubsystem.setTurretCommand(turretPositionSupplier)
-        // );
+        m_clawSubsystem.setDefaultCommand(m_clawSubsystem.controlClaw(clawStateSupplier));
     }
 
     /**

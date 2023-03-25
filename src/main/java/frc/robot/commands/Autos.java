@@ -40,6 +40,22 @@ public final class Autos {
                                 }));
     }
 
+    public static CommandBase doNothing(DriveSubsystem drive) {
+        return drive.arcadeDriveCommand(
+                () -> {
+                    return 0;
+                },
+                () -> {
+                    return 0;
+                },
+                () -> {
+                    return false;
+                },
+                () -> {
+                    return false;
+                });
+    }
+
     private Autos() {
         throw new UnsupportedOperationException("This is a utility class!");
     }
