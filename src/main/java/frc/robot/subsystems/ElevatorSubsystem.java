@@ -5,7 +5,7 @@ import static frc.robot.Constants.ElevatorConstants.*;
 
 import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.controls.DutyCycleOut;
-import com.ctre.phoenixpro.controls.PositionVoltage;
+import com.ctre.phoenixpro.controls.MotionMagicVoltage;
 import com.ctre.phoenixpro.hardware.TalonFX;
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -18,12 +18,12 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    private final double kElevatorLow = 0;
-    private final double kElevatorMid = 0;
-    private final double kElevatorHigh = 0;
+    private final double kElevatorLow = -43;
+    private final double kElevatorMid = 7.84;
+    private final double kElevatorHigh = 17.4;
     private final double kExtenderIn = 0;
-    private final double kExtenderMid = 0;
-    private final double kExtenderOut = 0;
+    private final double kExtenderMid = 19.4;
+    private final double kExtenderOut = 36.7;
 
     private final TalonFX m_elevatorMotor = new TalonFX(kElevatorTalonId, kCANivoreCANbus);
     private final TalonFX m_extenderMotor = new TalonFX(kExtenderTalonId, kCANivoreCANbus);
@@ -31,8 +31,10 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final DutyCycleOut m_elevatorPower = new DutyCycleOut(0);
     private final DutyCycleOut m_extenderPower = new DutyCycleOut(0);
 
-    private final PositionVoltage m_elevatorTarget = new PositionVoltage(0);
-    private final PositionVoltage m_extenderTarget = new PositionVoltage(0);
+    private final MotionMagicVoltage m_elevatorTarget = new MotionMagicVoltage(0);
+    private final MotionMagicVoltage m_extenderTarget = new MotionMagicVoltage(0);
+
+    private boolean m_closedLoop = false;
 
     public enum DesiredLocation {
         Stow,
@@ -50,12 +52,22 @@ public class ElevatorSubsystem extends SubsystemBase {
     public ElevatorSubsystem() {
         TalonFXConfiguration cfg = new TalonFXConfiguration();
 
+        cfg.MotionMagic.MotionMagicAcceleration = 100;
+        cfg.MotionMagic.MotionMagicCruiseVelocity = 200;
+
+        cfg.Slot0.kP = 20;
+
         CtrUtils.runUntilSuccessWithTimeoutPro(
                 (timeout) -> {
                     return m_elevatorMotor.getConfigurator().apply(cfg);
                 },
                 0.1,
                 5);
+
+        cfg.CurrentLimits.SupplyCurrentLimit = 40;
+        cfg.CurrentLimits.SupplyCurrentThreshold = 60;
+        cfg.CurrentLimits.SupplyTimeThreshold = 0.5;
+        cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
         CtrUtils.runUntilSuccessWithTimeoutPro(
                 (timeout) -> {
                     return m_extenderMotor.getConfigurator().apply(cfg);
@@ -74,13 +86,51 @@ public class ElevatorSubsystem extends SubsystemBase {
                 DesiredLocation.LoadStationPickup, new Pair<Double, Double>(kElevatorMid, kExtenderOut));
         m_stateLocations.put(
                 DesiredLocation.GroundPickup, new Pair<Double, Double>(kElevatorLow, kExtenderMid));
+
+        reZeroEverything();
     }
 
-    public CommandBase manualControlElevatorCommand(
-            DoubleSupplier elevatorPower, DoubleSupplier extenderPower) {
+    public void reZeroEverything() {
+        CtrUtils.runUntilSuccessWithTimeoutPro(
+                (timeout) -> {
+                    return m_elevatorMotor.setRotorPosition(0);
+                },
+                0.1,
+                5);
+        CtrUtils.runUntilSuccessWithTimeoutPro(
+                (timeout) -> {
+                    return m_extenderMotor.setRotorPosition(0);
+                },
+                0.1,
+                5);
+    }
+
+    public CommandBase controlElevatorCommand(
+            DoubleSupplier elevatorPower,
+            DoubleSupplier extenderPower,
+            Supplier<DesiredLocation> target) {
         return new RunCommand(
                         () -> {
-                            manualControlElevator(elevatorPower.getAsDouble(), extenderPower.getAsDouble());
+                            /* Two stages, first determine if we should close loop, then control */
+                            double elevPower = elevatorPower.getAsDouble();
+                            double extePower = extenderPower.getAsDouble();
+                            var targetState = target.get();
+
+                            if (Math.abs(elevPower) > 0.1 || Math.abs(extePower) > 0.1) {
+                                /* We're manually overriding */
+                                m_closedLoop = false;
+                            } else if (targetState != DesiredLocation.NoChange) {
+                                /* We're targetting a position */
+                                m_closedLoop = true;
+                            }
+
+                            if (m_closedLoop) {
+                                /* If we're closed looping, then set the closed loop target */
+                                setClosedLoop(targetState);
+                            } else {
+                                /* Otherwise use the manual control */
+                                manualControlElevator(elevPower, extePower);
+                            }
                         },
                         this)
                 .ignoringDisable(true);
@@ -89,15 +139,6 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void manualControlElevator(double elevatorPower, double extenderPower) {
         m_elevatorMotor.setControl(m_elevatorPower.withOutput(elevatorPower));
         m_extenderMotor.setControl(m_extenderPower.withOutput(extenderPower));
-    }
-
-    public CommandBase setClosedLoopCommand(Supplier<DesiredLocation> target) {
-        return new RunCommand(
-                        () -> {
-                            setClosedLoop(target.get());
-                        },
-                        this)
-                .ignoringDisable(true);
     }
 
     public void setClosedLoop(DesiredLocation targetLocation) {

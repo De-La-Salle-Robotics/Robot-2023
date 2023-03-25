@@ -30,11 +30,11 @@ public final class Constants {
     }
 
     public static class ClawConstants {
-        public static final int kClawTalonId = 6;
+        public static final int kClawTalonId = 20;
     }
 
     public static class ElevatorConstants {
-        public static final int kElevatorTalonId = 7;
-        public static final int kExtenderTalonId = 8;
+        public static final int kElevatorTalonId = 10;
+        public static final int kExtenderTalonId = 11;
     }
 }

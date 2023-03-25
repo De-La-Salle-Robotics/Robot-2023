@@ -2,8 +2,9 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.ClawConstants.*;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
+import com.ctre.phoenixpro.configs.TalonFXConfiguration;
+import com.ctre.phoenixpro.controls.TorqueCurrentFOC;
+import com.ctre.phoenixpro.hardware.TalonFX;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -11,11 +12,13 @@ import frc.robot.utils.CtrUtils;
 import java.util.function.Supplier;
 
 public class ClawSubsystem extends SubsystemBase {
-    private final double kSuckPower = 0.6;
-    private final double kBlowPower = -0.6;
+    private final double kMaxDutyCycle = 0.5;
+    private final double kSuckPower = 200;
+    private final double kBlowPower = -200;
     private final double kNeutralPower = 0.0;
 
-    private final WPI_TalonFX m_clawMotor = new WPI_TalonFX(kClawTalonId, "rio");
+    private final TalonFX m_clawMotor = new TalonFX(kClawTalonId, "rio");
+    private final TorqueCurrentFOC m_torqueDemand = new TorqueCurrentFOC(0);
 
     public enum ClawState {
         Sucking,
@@ -25,9 +28,10 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     public ClawSubsystem() {
-        CtrUtils.runUntilSuccessWithTimeoutV5(
+        TalonFXConfiguration cfg = new TalonFXConfiguration();
+        CtrUtils.runUntilSuccessWithTimeoutPro(
                 (timeout) -> {
-                    return m_clawMotor.configFactoryDefault(timeout);
+                    return m_clawMotor.getConfigurator().apply(cfg, timeout);
                 },
                 100,
                 5);
@@ -55,14 +59,17 @@ public class ClawSubsystem extends SubsystemBase {
     }
 
     public void suck() {
-        m_clawMotor.set(ControlMode.PercentOutput, kSuckPower);
+        m_clawMotor.setControl(
+                m_torqueDemand.withOutput(kSuckPower).withMaxAbsDutyCycle(kMaxDutyCycle));
     }
 
     public void blow() {
-        m_clawMotor.set(ControlMode.PercentOutput, kBlowPower);
+        m_clawMotor.setControl(
+                m_torqueDemand.withOutput(kBlowPower).withMaxAbsDutyCycle(kMaxDutyCycle));
     }
 
     public void neutral() {
-        m_clawMotor.set(ControlMode.PercentOutput, kNeutralPower);
+        m_clawMotor.setControl(
+                m_torqueDemand.withOutput(kNeutralPower).withMaxAbsDutyCycle(kMaxDutyCycle));
     }
 }

@@ -5,6 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
@@ -67,22 +68,14 @@ public class RobotContainer {
                     return DesiredLocation.NoChange;
                 };
         m_elevatorSubsystem.setDefaultCommand(
-                m_elevatorSubsystem.setClosedLoopCommand(elevatorLocationSupplier));
-
-        new Trigger(
-                        /* If the joystick is deflected, fall back to manual control */
+                m_elevatorSubsystem.controlElevatorCommand(
                         () -> {
-                            return Math.abs(m_operatorController.getLeftY()) > 0.1
-                                    || Math.abs(m_operatorController.getRightY()) > 0.1;
-                        })
-                .whileTrue(
-                        m_elevatorSubsystem.manualControlElevatorCommand(
-                                () -> {
-                                    return -m_operatorController.getLeftY();
-                                },
-                                () -> {
-                                    return -m_operatorController.getRightY();
-                                }));
+                            return -m_operatorController.getLeftY();
+                        },
+                        () -> {
+                            return -m_operatorController.getRightY();
+                        },
+                        elevatorLocationSupplier));
 
         Supplier<ClawSubsystem.ClawState> clawStateSupplier =
                 () -> {
@@ -96,6 +89,13 @@ public class RobotContainer {
                     }
                 };
         m_clawSubsystem.setDefaultCommand(m_clawSubsystem.controlClaw(clawStateSupplier));
+
+        m_operatorController
+                .back()
+                .and(m_operatorController.start())
+                .onTrue(
+                        new InstantCommand(m_elevatorSubsystem::reZeroEverything, m_elevatorSubsystem)
+                                .ignoringDisable(true));
     }
 
     /**
