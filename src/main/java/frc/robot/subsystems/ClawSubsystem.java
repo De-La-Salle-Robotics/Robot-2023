@@ -16,6 +16,7 @@ public class ClawSubsystem extends SubsystemBase {
     private final double kSuckPower = 200;
     private final double kBlowPower = -200;
     private final double kNeutralPower = 0.0;
+    private final double kScorePower = -20.0;
 
     private final TalonFX m_clawMotor = new TalonFX(kClawTalonId, "rio");
     private final TorqueCurrentFOC m_torqueDemand = new TorqueCurrentFOC(0);

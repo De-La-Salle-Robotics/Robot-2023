@@ -3,11 +3,15 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.*;
 import static frc.robot.Constants.DriveTrainConstants.*;
 
+import com.ctre.phoenixpro.configs.MotorOutputConfigs;
 import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.controls.DutyCycleOut;
 import com.ctre.phoenixpro.controls.Follower;
 import com.ctre.phoenixpro.hardware.TalonFX;
 import com.ctre.phoenixpro.signals.NeutralModeValue;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -30,9 +34,15 @@ public class DriveSubsystem extends SubsystemBase {
     private Follower m_leftFollow = new Follower(m_leftDrive1.getDeviceID(), false);
     private Follower m_rghtFollow = new Follower(m_rghtDrive1.getDeviceID(), false);
 
+    private Timer m_disableTimer = new Timer();
+
+    private MotorOutputConfigs m_motorOutputConfigs = new MotorOutputConfigs();
+    private boolean m_lastNeutralModeIsBrake = false;
+
     public DriveSubsystem() {
         TalonFXConfiguration cfg = new TalonFXConfiguration();
-        cfg.MotorOutput.NeutralMode = NeutralModeValue.Brake;
+        m_motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
+        cfg.MotorOutput = m_motorOutputConfigs;
 
         CtrUtils.runUntilSuccessWithTimeoutPro(
                 (timeout) -> {
@@ -96,12 +106,12 @@ public class DriveSubsystem extends SubsystemBase {
 
     public void arcadeDrive(
             double forward, double turn, boolean slowdownEnabled, boolean speedupEnabled) {
-        double speed = 0.3;
+        double speed = 0.6;
         if (slowdownEnabled) {
             speed = 0.15;
         }
         if (speedupEnabled) {
-            speed = 0.45;
+            speed = 1;
         }
 
         double inverseSpeed = 1 - (speed * 0.5);
@@ -117,6 +127,39 @@ public class DriveSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+        boolean isEnabled = DriverStation.isEnabled();
+        if(isEnabled == false) {
+            m_disableTimer.start();
+        }
+        if(isEnabled == true) {
+            m_disableTimer.stop();
+            m_disableTimer.reset();
+        }
+
+        if(m_disableTimer.get() > 5) {
+            /* Coast after 5 seconds of disable */
+            if(m_lastNeutralModeIsBrake) {
+                m_motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
+                m_leftDrive1.getConfigurator().apply(m_motorOutputConfigs);
+                m_leftDrive2.getConfigurator().apply(m_motorOutputConfigs);
+                m_leftDrive3.getConfigurator().apply(m_motorOutputConfigs);
+                m_rghtDrive1.getConfigurator().apply(m_motorOutputConfigs);
+                m_rghtDrive2.getConfigurator().apply(m_motorOutputConfigs);
+                m_rghtDrive3.getConfigurator().apply(m_motorOutputConfigs);
+            }
+            m_lastNeutralModeIsBrake = false;
+        } else {
+            if(!m_lastNeutralModeIsBrake) {
+                m_motorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
+                m_leftDrive1.getConfigurator().apply(m_motorOutputConfigs);
+                m_leftDrive2.getConfigurator().apply(m_motorOutputConfigs);
+                m_leftDrive3.getConfigurator().apply(m_motorOutputConfigs);
+                m_rghtDrive1.getConfigurator().apply(m_motorOutputConfigs);
+                m_rghtDrive2.getConfigurator().apply(m_motorOutputConfigs);
+                m_rghtDrive3.getConfigurator().apply(m_motorOutputConfigs);
+            }
+            m_lastNeutralModeIsBrake = true;
+        }
     }
 
     @Override
