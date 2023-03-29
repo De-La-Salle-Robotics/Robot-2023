@@ -5,6 +5,8 @@ import static frc.robot.Constants.ClawConstants.*;
 import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.controls.TorqueCurrentFOC;
 import com.ctre.phoenixpro.hardware.TalonFX;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -57,6 +59,11 @@ public class ClawSubsystem extends SubsystemBase {
                         },
                         this)
                 .ignoringDisable(true);
+    }
+
+    @Override
+    public void periodic() {
+        SmartDashboard.putNumber("Claw Power", m_torqueDemand.Output);
     }
 
     public void suck() {

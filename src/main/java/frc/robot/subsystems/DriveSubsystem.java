@@ -9,7 +9,6 @@ import com.ctre.phoenixpro.controls.DutyCycleOut;
 import com.ctre.phoenixpro.controls.Follower;
 import com.ctre.phoenixpro.hardware.TalonFX;
 import com.ctre.phoenixpro.signals.NeutralModeValue;
-
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -128,17 +127,17 @@ public class DriveSubsystem extends SubsystemBase {
     public void periodic() {
         // This method will be called once per scheduler run
         boolean isEnabled = DriverStation.isEnabled();
-        if(isEnabled == false) {
+        if (isEnabled == false) {
             m_disableTimer.start();
         }
-        if(isEnabled == true) {
+        if (isEnabled == true) {
             m_disableTimer.stop();
             m_disableTimer.reset();
         }
 
-        if(m_disableTimer.get() > 5) {
+        if (m_disableTimer.get() > 5) {
             /* Coast after 5 seconds of disable */
-            if(m_lastNeutralModeIsBrake) {
+            if (m_lastNeutralModeIsBrake) {
                 m_motorOutputConfigs.NeutralMode = NeutralModeValue.Coast;
                 m_leftDrive1.getConfigurator().apply(m_motorOutputConfigs);
                 m_leftDrive2.getConfigurator().apply(m_motorOutputConfigs);
@@ -149,7 +148,7 @@ public class DriveSubsystem extends SubsystemBase {
             }
             m_lastNeutralModeIsBrake = false;
         } else {
-            if(!m_lastNeutralModeIsBrake) {
+            if (!m_lastNeutralModeIsBrake) {
                 m_motorOutputConfigs.NeutralMode = NeutralModeValue.Brake;
                 m_leftDrive1.getConfigurator().apply(m_motorOutputConfigs);
                 m_leftDrive2.getConfigurator().apply(m_motorOutputConfigs);
