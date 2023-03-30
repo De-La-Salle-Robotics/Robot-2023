@@ -57,17 +57,17 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         cfg.Slot0.kP = 20;
 
+        cfg.CurrentLimits.SupplyCurrentLimit = 40;
+        cfg.CurrentLimits.SupplyCurrentThreshold = 40;
+        cfg.CurrentLimits.SupplyTimeThreshold = 0;
+        cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
+
         CtrUtils.runUntilSuccessWithTimeoutPro(
                 (timeout) -> {
                     return m_elevatorMotor.getConfigurator().apply(cfg);
                 },
                 0.1,
                 5);
-
-        cfg.CurrentLimits.SupplyCurrentLimit = 40;
-        cfg.CurrentLimits.SupplyCurrentThreshold = 60;
-        cfg.CurrentLimits.SupplyTimeThreshold = 0.5;
-        cfg.CurrentLimits.SupplyCurrentLimitEnable = true;
         CtrUtils.runUntilSuccessWithTimeoutPro(
                 (timeout) -> {
                     return m_extenderMotor.getConfigurator().apply(cfg);
