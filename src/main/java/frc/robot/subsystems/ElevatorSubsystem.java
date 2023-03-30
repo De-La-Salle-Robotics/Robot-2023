@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.utils.CtrUtils;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
@@ -112,29 +113,19 @@ public class ElevatorSubsystem extends SubsystemBase {
     public CommandBase controlElevatorCommand(
             DoubleSupplier elevatorPower,
             DoubleSupplier extenderPower,
-            Supplier<DesiredLocation> target) {
+            BooleanSupplier elevatorUp,
+            BooleanSupplier elevatorDown) {
         return new RunCommand(
                         () -> {
                             /* Two stages, first determine if we should close loop, then control */
                             double elevPower = elevatorPower.getAsDouble();
                             double extePower = extenderPower.getAsDouble();
-                            var targetState = target.get();
 
-                            if (Math.abs(elevPower) > 0.1 || Math.abs(extePower) > 0.1) {
-                                /* We're manually overriding */
-                                m_closedLoop = false;
-                            } else if (targetState != DesiredLocation.NoChange) {
-                                /* We're targetting a position */
-                                m_closedLoop = true;
-                            }
+                            if(elevatorUp.getAsBoolean()) {elevPower = 1.0;}
+                            if(elevatorDown.getAsBoolean()) { elevPower = -1.0;}
 
-                            if (m_closedLoop) {
-                                /* If we're closed looping, then set the closed loop target */
-                                setClosedLoop(targetState);
-                            } else {
-                                /* Otherwise use the manual control */
-                                manualControlElevator(elevPower, extePower);
-                            }
+                            /* Otherwise use the manual control */
+                            manualControlElevator(elevPower, extePower);
                         },
                         this)
                 .ignoringDisable(true);

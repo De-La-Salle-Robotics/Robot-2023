@@ -108,7 +108,8 @@ public class RobotContainer {
                         () -> {
                             return -m_operatorController.getRightY();
                         },
-                        elevatorLocationSupplier));
+                        m_operatorController.getHID()::getYButton,
+                        m_operatorController.getHID()::getAButton));
 
         Supplier<ClawSubsystem.ClawState> clawStateSupplier =
                 () -> {
