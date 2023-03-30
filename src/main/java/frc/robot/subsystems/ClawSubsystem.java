@@ -5,7 +5,6 @@ import static frc.robot.Constants.ClawConstants.*;
 import com.ctre.phoenixpro.configs.TalonFXConfiguration;
 import com.ctre.phoenixpro.controls.TorqueCurrentFOC;
 import com.ctre.phoenixpro.hardware.TalonFX;
-
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
