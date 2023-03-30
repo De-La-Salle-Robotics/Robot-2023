@@ -60,23 +60,27 @@ public final class Autos {
     }
 
     public static CommandBase spitAndDriveBack(DriveSubsystem drive, ClawSubsystem claw) {
-        return new RunCommand(() -> drive.arcadeDrive(1, 0, false, false), drive) // Drive fast backwards to knock claw down
+        return new RunCommand(
+                        () -> drive.arcadeDrive(1, 0, false, false),
+                        drive) // Drive fast backwards to knock claw down
                 .withTimeout(0.5)
-                .andThen(new RunCommand(() -> drive.arcadeDrive(0, 0, false, false), drive)
-                .withTimeout(0.3)) // Stop driving to allow claw to fall
-                
-                .andThen(new RunCommand(() -> drive.arcadeDrive(-0.2, 0, false, false), drive)
-                .withTimeout(1.8)) // Drive forward to make up distance from driving backward
-                
-                .andThen(new InstantCommand(()->claw.blow(), claw)) // Blow
-                .andThen(new RunCommand(() -> drive.arcadeDrive(0.2, 0, false, false), drive)
-                .withTimeout(1)) // And start driving backwards
-                
-                .andThen(new InstantCommand(()->claw.neutral(), claw)) // Stop blowing
-                .andThen(new RunCommand(() -> drive.arcadeDrive(0.2, 0, false, false), drive)
-                .withTimeout(5)) // And continue to drive backwards
-                
-                .andThen(new InstantCommand(()->drive.arcadeDrive(0, 0, false, false), drive)); // Until we cross the line
+                .andThen(
+                        new RunCommand(() -> drive.arcadeDrive(0, 0, false, false), drive)
+                                .withTimeout(0.3)) // Stop driving to allow claw to fall
+                .andThen(
+                        new RunCommand(() -> drive.arcadeDrive(-0.2, 0, false, false), drive)
+                                .withTimeout(1.8)) // Drive forward to make up distance from driving backward
+                .andThen(new InstantCommand(() -> claw.blow(), claw)) // Blow
+                .andThen(
+                        new RunCommand(() -> drive.arcadeDrive(0.2, 0, false, false), drive)
+                                .withTimeout(1)) // And start driving backwards
+                .andThen(new InstantCommand(() -> claw.neutral(), claw)) // Stop blowing
+                .andThen(
+                        new RunCommand(() -> drive.arcadeDrive(0.2, 0, false, false), drive)
+                                .withTimeout(5)) // And continue to drive backwards
+                .andThen(
+                        new InstantCommand(
+                                () -> drive.arcadeDrive(0, 0, false, false), drive)); // Until we cross the line
     }
 
     public enum AutoRoutines {

@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.led.CANdle;
-
 import edu.wpi.first.wpilibj.TimedRobot;
 
 public class LEDSubsystem extends TimedRobot {
@@ -10,7 +9,7 @@ public class LEDSubsystem extends TimedRobot {
 
     private void ledSetup() {
         m_CANdle.configBrightnessScalar(0.5, 0);
-        //m_CANdle.setLEDs(255, 0, 0, 50, 0, 4);
+        // m_CANdle.setLEDs(255, 0, 0, 50, 0, 4);
         m_CANdle.setLEDs(255, 0, 255);
     }
 
@@ -19,7 +18,7 @@ public class LEDSubsystem extends TimedRobot {
     }
 
     @Override
-    public void robotInit(){
+    public void robotInit() {
         ledSetup();
     }
 }

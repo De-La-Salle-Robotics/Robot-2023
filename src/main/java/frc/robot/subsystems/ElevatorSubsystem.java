@@ -8,6 +8,7 @@ import com.ctre.phoenixpro.controls.DutyCycleOut;
 import com.ctre.phoenixpro.controls.MotionMagicVoltage;
 import com.ctre.phoenixpro.hardware.TalonFX;
 import edu.wpi.first.math.Pair;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -33,6 +34,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private final MotionMagicVoltage m_elevatorTarget = new MotionMagicVoltage(0);
     private final MotionMagicVoltage m_extenderTarget = new MotionMagicVoltage(0);
+
+    private final DigitalInput m_extenderForwardLimit = new DigitalInput(kExtenderForwardLimitPort);
+    private final DigitalInput m_extenderReverseLimit = new DigitalInput(kExtenderReverseLimitPort);
 
     private boolean m_closedLoop = false;
 
@@ -137,6 +141,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void manualControlElevator(double elevatorPower, double extenderPower) {
+        if (m_extenderForwardLimit.get()) {
+            /* We're forward limited, so prevent positive extender power */
+            if (extenderPower > 0) extenderPower = 0;
+        }
+        if (m_extenderReverseLimit.get()) {
+            /* We're reverse limited, so prevent negative extender power */
+            if (extenderPower < 0) extenderPower = 0;
+        }
         m_elevatorMotor.setControl(m_elevatorPower.withOutput(elevatorPower));
         m_extenderMotor.setControl(m_extenderPower.withOutput(extenderPower));
     }

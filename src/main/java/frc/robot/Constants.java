@@ -36,5 +36,8 @@ public final class Constants {
     public static class ElevatorConstants {
         public static final int kElevatorTalonId = 10;
         public static final int kExtenderTalonId = 11;
+
+        public static final int kExtenderForwardLimitPort = 0;
+        public static final int kExtenderReverseLimitPort = 1;
     }
 }
